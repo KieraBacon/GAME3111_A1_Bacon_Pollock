@@ -352,6 +352,52 @@ GeometryGenerator::MeshData GeometryGenerator::CreatePyramid(float width, float 
 GeometryGenerator::MeshData GeometryGenerator::CreateDiamond(float width, float height, float depth, uint32 numSubdivisions)
 {
 	MeshData meshData;
+
+	//
+	// Create the vertices.
+	//
+	
+	Vertex v[6];
+
+	float w2 = 0.5f * width;
+	float h2 = 0.5f * height;
+	float d2 = 0.5f * depth;
+
+	// Top
+	v[0] = Vertex(0.0f, h2, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);		// Peak
+	v[1] = Vertex(0.0f, 0.0f, d2, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);		// Front
+	v[2] = Vertex(w2, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);		// Right
+	v[3] = Vertex(0.0f, 0.0f, -d2, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);	// Back
+	v[4] = Vertex(-w2, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);	// Left
+	v[5] = Vertex(0.0f, -h2, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);	// Base
+
+
+	meshData.Vertices.assign(&v[0], &v[6]);
+
+	//
+	// Create the indices.
+	//
+
+	uint32 i[24];
+
+	i[0] = 0; i[1] = 1; i[2] = 2;
+	i[3] = 0; i[4] = 2; i[5] = 3;
+	i[6] = 0; i[7] = 3; i[8] = 4;
+	i[9] = 0; i[10] = 4; i[11] = 1;
+
+	i[12] = 5; i[13] = 2; i[14] = 1;
+	i[15] = 5; i[16] = 3; i[17] = 2;
+	i[18] = 5; i[19] = 4; i[20] = 3;
+	i[21] = 5; i[22] = 1; i[23] = 4;
+
+	meshData.Indices32.assign(&i[0], &i[24]);
+
+	// Put a cap on the number of subdivisions.
+	numSubdivisions = std::min<uint32>(numSubdivisions, 6u);
+
+	for (uint32 i = 0; i < numSubdivisions; ++i)
+		Subdivide(meshData);
+
 	return meshData;
 }
 

@@ -1,2 +1,5 @@
-﻿  GeometryGenerator.cpp
+﻿  Week4-1-ShapesAppUsingDescriptorTable.cpp
+D:\Repos\GAME3111\DirectX\GAME3111_A1_Bacon_Pollock\GAME3111_A1_Bacon\Week4-1-ShapesAppUsingDescriptorTable.cpp(792,142): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\Repos\GAME3111\DirectX\GAME3111_A1_Bacon_Pollock\GAME3111_A1_Bacon\Week4-1-ShapesAppUsingDescriptorTable.cpp(793,144): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\Repos\GAME3111\DirectX\GAME3111_A1_Bacon_Pollock\GAME3111_A1_Bacon\Week4-1-ShapesAppUsingDescriptorTable.cpp(794,144): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   GAME3111_A1_Bacon.vcxproj -> D:\Repos\GAME3111\DirectX\GAME3111_A1_Bacon_Pollock\x64\Debug\GAME3111_A1_Bacon.exe

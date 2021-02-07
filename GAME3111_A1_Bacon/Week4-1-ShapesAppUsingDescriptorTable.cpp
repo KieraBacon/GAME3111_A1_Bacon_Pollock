@@ -568,7 +568,7 @@ void ShapesApp::BuildShapeGeometry()
 	GeometryGenerator::MeshData wedge = geoGen.CreateWedge(1.0f, 1.0f, 1.0f, 2);
 	GeometryGenerator::MeshData torus = geoGen.CreateTorus(1.0f, 0.1f, 8, 8);
 	GeometryGenerator::MeshData pyramid = geoGen.CreatePyramid(1.0f, 1.0f, 1.0f, 2);
-	//GeometryGenerator::MeshData diamond = geoGen.CreateDiamond(0.5f, 1.5f, 1.0f, 3);
+	GeometryGenerator::MeshData diamond = geoGen.CreateDiamond(1.0f, 1.0f, 1.0f, 2);
 	GeometryGenerator::MeshData triangularPrism = geoGen.CreateTriangularPrism(1.0f, 1.0f, 1.0f, 2);
 	GeometryGenerator::MeshData truncatedPyramid = geoGen.CreateTruncatedPyramid(1.0f, 1.0f, 0.5f, 0.5f, 0.75f, 3);
 
@@ -598,6 +598,7 @@ void ShapesApp::BuildShapeGeometry()
 	submeshData.push_back(SubmeshData{ std::move(wedge),		"wedge",		XMFLOAT4(DirectX::Colors::DarkGoldenrod) });
 	submeshData.push_back(SubmeshData{ std::move(torus),		"torus",		XMFLOAT4(DirectX::Colors::DarkOrchid) });
 	submeshData.push_back(SubmeshData{ std::move(pyramid),		"pyramid",		XMFLOAT4(DirectX::Colors::BurlyWood) });
+	submeshData.push_back(SubmeshData{ std::move(diamond),		"diamond",		XMFLOAT4(DirectX::Colors::Chocolate) });
 	submeshData.push_back(SubmeshData{ std::move(triangularPrism), "triangularPrism", XMFLOAT4(DirectX::Colors::Azure) });
 	submeshData.push_back(SubmeshData{ std::move(truncatedPyramid), "truncatedPyramid", XMFLOAT4(DirectX::Colors::Bisque) });
 
@@ -767,7 +768,7 @@ diamond: (3.8, 2, 0 )(width: 0.2, height: 1.5)
 diamond: (6.2, 2, 0) (width: 0.2, height: 1.5)
 	*/
 #define ADDRITEM mAllRitems.emplace_back(std::make_unique<RenderItem>
-	ADDRITEM("grid", oI++, geo, XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, -5.0f, 0.0f)));
+	ADDRITEM("grid", oI++, geo,					XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, -5.0f, 0.0f)));
 	// Body:
 	ADDRITEM("cylinder", oI++, geo,             XMMatrixScaling(10.0f, 4.0f, 10.0f) * XMMatrixTranslation(0.0f, -3.0f, 0.0f)));
 	ADDRITEM("nCyl10_9", oI++, geo,             XMMatrixScaling(10.0f, 2.0f, 10.0f) * XMMatrixTranslation(0.0f, 0.0f, 0.0f)));
@@ -779,16 +780,18 @@ diamond: (6.2, 2, 0) (width: 0.2, height: 1.5)
 	ADDRITEM("torus", oI++, geo,				XMMatrixScaling(4.0f, 4.0f, 4.0f) * XMMatrixTranslation(0.0f, 14.0f, 0.0f)));
 	// Spires:
 	UINT numSpires = 8;
-	float thetaStep = 2.0 * XM_PI / numSpires;
+	float thetaStep = XM_2PI / numSpires;
 	for (UINT i = 0; i < numSpires; i++)
 	{
 		float zOffset = cosf(thetaStep * i) * 10.0f;
 		float xOffset = sinf(thetaStep * i) * 10.0f;
-		ADDRITEM("triangularPrism", oI++, geo,      XMMatrixRotationY(-thetaStep * i) * XMMatrixScaling(0.5f, 10.5f, 0.5f) * XMMatrixTranslation(xOffset, 0.25f, zOffset)));
-		ADDRITEM("pyramid", oI++, geo,              XMMatrixRotationY(thetaStep * i) * XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(xOffset, 6.0f, zOffset)));
+		ADDRITEM("triangularPrism", oI++, geo,  XMMatrixRotationY(XM_PI / -4) * XMMatrixScaling(0.5f, 10.5f, 0.5f) * XMMatrixTranslation(7.1f, 0.25f, 7.1f) * XMMatrixRotationY(thetaStep * i)));
+		ADDRITEM("pyramid", oI++, geo,          XMMatrixRotationY(XM_PI / -4) * XMMatrixScaling(1.0f, 1.0f, 1.0f)  * XMMatrixTranslation(7.1f, 6.0f,  7.1f) * XMMatrixRotationY(thetaStep * i)));
 	}
 	// Ramp:
-	ADDRITEM("wedge", oI++, geo,				 XMMatrixScaling(4.0f, 1.5f, 4.0f) * XMMatrixRotationY(thetaStep * 0.5f) * XMMatrixTranslation(-sinf(thetaStep * 0.5f) * 11.25f, -4.35f, -cosf(thetaStep * 0.5f) * 11.25f)));
+	ADDRITEM("wedge", oI++, geo,				XMMatrixScaling(3.0f, 1.0f, 4.0f) * XMMatrixTranslation(0.0f, -4.5f, -11.25f) * XMMatrixRotationY(thetaStep * 0.5)));
+	ADDRITEM("diamond", oI++, geo,				XMMatrixScaling(0.5f, 2.0f, 0.5f) * XMMatrixTranslation(2.0f, -2.5f, -9.25f)  * XMMatrixRotationY(thetaStep * 0.5)));
+	ADDRITEM("diamond", oI++, geo,				XMMatrixScaling(0.5f, 2.0f, 0.5f) * XMMatrixTranslation(-2.0f, -2.5f, -9.25f) * XMMatrixRotationY(thetaStep * 0.5)));
 #undef ADDRITEM
 
 	// All the render items are opaque.
