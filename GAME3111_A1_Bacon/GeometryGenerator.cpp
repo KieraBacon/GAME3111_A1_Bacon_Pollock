@@ -1142,36 +1142,38 @@ GeometryGenerator::MeshData GeometryGenerator::CreateTorus(float radius, float c
 	float phiStep = 2.0f * XM_PI / crossCount;
 
 	// For each slice around the circumference of the torus
-	for (uint32 i = 0; i < sliceCount; ++i)
+	for (uint32 i = 0; i <= crossCount - 1; ++i)
 	{
-		float theta = i * thetaStep;
+		float phi = i * phiStep;
 
-		// For each slice around the cross section
-		for (uint32 j = 0; j < crossCount; ++j)
+		// Vertices of ring.
+		for (uint32 j = 0; j <= sliceCount; ++j)
 		{
-			float phi = j * phiStep;
+			float theta = j * thetaStep;
 
 			Vertex v;
 
-			// Create the inner cylinder
-			v.Position.x = crossRadius * sinf(phi);
+			float c = cosf(theta);
+			float s = sinf(theta);
+
+			// spherical to cartesian
+			v.Position.x = radius * c + crossRadius * sinf(phi) * c;
 			v.Position.y = crossRadius * cosf(phi);
-			v.Position.z = 0.0f;
+			v.Position.z = radius * s + crossRadius * sinf(phi) * s;
 
-			// Move the inner cylinder to its position along the outer radius
-			v.Position.x += radius * sinf(theta);
-			v.Position.z += radius * cosf(theta);
+			// Partial derivative of P with respect to theta
+			v.TangentU.x = -crossRadius * sinf(phi) * sinf(theta);
+			v.TangentU.y = 0.0f;
+			v.TangentU.z = crossRadius * sinf(phi) * cosf(theta);
 
-			//// Partial derivative of P with respect to theta
-			//v.TangentU.x = -radius * sinf(phi) * sinf(theta);
-			//v.TangentU.y = 0.0f;
-			//v.TangentU.z = +radius * sinf(phi) * cosf(theta);
-			//XMVECTOR T = XMLoadFloat3(&v.TangentU);
-			//XMStoreFloat3(&v.TangentU, XMVector3Normalize(T));
-			//XMVECTOR p = XMLoadFloat3(&v.Position);
-			//XMStoreFloat3(&v.Normal, XMVector3Normalize(p));
-			//v.TexC.x = theta / XM_2PI;
-			//v.TexC.y = phi / XM_PI;
+			XMVECTOR T = XMLoadFloat3(&v.TangentU);
+			XMStoreFloat3(&v.TangentU, XMVector3Normalize(T));
+
+			XMVECTOR p = XMLoadFloat3(&v.Position);
+			XMStoreFloat3(&v.Normal, XMVector3Normalize(p));
+
+			v.TexC.x = theta / XM_2PI;
+			v.TexC.y = phi / XM_PI;
 
 			meshData.Vertices.push_back(v);
 		}

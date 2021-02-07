@@ -125,9 +125,9 @@ private:
 	XMFLOAT4X4 mView = MathHelper::Identity4x4();
 	XMFLOAT4X4 mProj = MathHelper::Identity4x4();
 
-    float mTheta = 1.5f*XM_PI;
-    float mPhi = 0.2f*XM_PI;
-    float mRadius = 15.0f;
+    float mTheta = 1.25f*XM_PI;
+    float mPhi = 0.4f*XM_PI;
+    float mRadius = 35.0f;
 
     POINT mLastMousePos;
 };
@@ -555,19 +555,21 @@ void ShapesApp::BuildShadersAndInputLayout()
 void ShapesApp::BuildShapeGeometry()
 {
     GeometryGenerator geoGen;
-	GeometryGenerator::MeshData box = geoGen.CreateBox(1.5f, 0.5f, 1.5f, 3);
-	GeometryGenerator::MeshData cylinder = geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20);
-	GeometryGenerator::MeshData sphere = geoGen.CreateSphere(0.5f, 20, 20);
-	GeometryGenerator::MeshData geosphere = geoGen.CreateGeosphere(0.5f, 20);
-	GeometryGenerator::MeshData grid = geoGen.CreateGrid(20.0f, 30.0f, 60, 40);
+	GeometryGenerator::MeshData box = geoGen.CreateBox(1.0f, 1.0f, 1.0f, 2);
+	GeometryGenerator::MeshData cylinder = geoGen.CreateCylinder(1.0f, 1.0f, 1.0f, 8, 2);
+	GeometryGenerator::MeshData sphere = geoGen.CreateSphere(1.0f, 16, 8);
+	GeometryGenerator::MeshData geosphere = geoGen.CreateGeosphere(1.0f, 8);
+	GeometryGenerator::MeshData grid = geoGen.CreateGrid(100.0f, 100.0f, 50, 50);
 	GeometryGenerator::MeshData quad = geoGen.CreateQuad(1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 
-	GeometryGenerator::MeshData cone = geoGen.CreateCone(1.5f, 2.0f, 20, 6);
-	GeometryGenerator::MeshData wedge = geoGen.CreateWedge(1.0f, 1.0f, 1.0f, 3);
-	GeometryGenerator::MeshData torus = geoGen.CreateTorus(2.0f, 0.25f, 20, 8);
-	GeometryGenerator::MeshData pyramid = geoGen.CreatePyramid(2.0f, 1.0f, 2.0f, 3);
+	GeometryGenerator::MeshData cone = geoGen.CreateCone(1.0f, 1.0f, 8, 2);
+	GeometryGenerator::MeshData nCyl10_9 = geoGen.CreateCylinder(1.0f, 0.9f, 1.0f, 8, 2);
+	GeometryGenerator::MeshData nCyl9_5 = geoGen.CreateCylinder(0.9f, 0.5f, 1.0f, 8, 2);
+	GeometryGenerator::MeshData wedge = geoGen.CreateWedge(1.0f, 1.0f, 1.0f, 2);
+	GeometryGenerator::MeshData torus = geoGen.CreateTorus(1.0f, 0.1f, 8, 8);
+	GeometryGenerator::MeshData pyramid = geoGen.CreatePyramid(1.0f, 1.0f, 1.0f, 2);
 	//GeometryGenerator::MeshData diamond = geoGen.CreateDiamond(0.5f, 1.5f, 1.0f, 3);
-	GeometryGenerator::MeshData triangularPrism = geoGen.CreateTriangularPrism(2.0f, 1.0f, 1.0f, 3);
+	GeometryGenerator::MeshData triangularPrism = geoGen.CreateTriangularPrism(1.0f, 1.0f, 1.0f, 2);
 	GeometryGenerator::MeshData truncatedPyramid = geoGen.CreateTruncatedPyramid(1.0f, 1.0f, 0.5f, 0.5f, 0.75f, 3);
 
 	//
@@ -590,7 +592,9 @@ void ShapesApp::BuildShapeGeometry()
 	submeshData.push_back(SubmeshData{ std::move(grid),			"grid",			XMFLOAT4(DirectX::Colors::ForestGreen) });
 	submeshData.push_back(SubmeshData{ std::move(quad),			"quad",			XMFLOAT4(DirectX::Colors::LawnGreen) });
 	
-	submeshData.push_back(SubmeshData{ std::move(cone),			"cone",			XMFLOAT4(DirectX::Colors::Chartreuse) });
+	submeshData.push_back(SubmeshData{ std::move(cone),			"cone",			XMFLOAT4(DirectX::Colors::SeaGreen) });
+	submeshData.push_back(SubmeshData{ std::move(nCyl10_9),     "nCyl10_9",     XMFLOAT4(DirectX::Colors::SlateBlue) });
+	submeshData.push_back(SubmeshData{ std::move(nCyl9_5),      "nCyl9_5",      XMFLOAT4(DirectX::Colors::SlateBlue) });
 	submeshData.push_back(SubmeshData{ std::move(wedge),		"wedge",		XMFLOAT4(DirectX::Colors::DarkGoldenrod) });
 	submeshData.push_back(SubmeshData{ std::move(torus),		"torus",		XMFLOAT4(DirectX::Colors::DarkOrchid) });
 	submeshData.push_back(SubmeshData{ std::move(pyramid),		"pyramid",		XMFLOAT4(DirectX::Colors::BurlyWood) });
@@ -739,68 +743,63 @@ void ShapesApp::BuildRenderItems()
 {
 	UINT oI = 0;
 	auto geo = mGeometries["shapeGeo"].get();
+
+	/*
+	* CASTLE PARTS
+BODY:
+8 sided cylinder (0, 0, 0)(radius: 10, height: 4)
+8 sided cylinder (0, 4, 0)(base radius: 10, top radius: 9, height, 2)
+8 sided cylinder (0, 6, 0)(radius: 9) (height: 3)
+8 sided cylinder (0, 9, 0)(base radius: 9, top radius: 5, height: 4)
+peak:
+8 sided cone (0, 13, 0)(base radius: 5, height: 5)
+Torus (0, 15, 0)(radius: 5)
+Torus (0, 17, 0)(radius: 4)
+
+Spires:
+8 x
+    Triangular prism (-0.4, 0, 0)(width: 0.5, height: 10.5)
+    Pyramid (-0.4, 10.5, 0)(width: 1, height: 1)
+
+Ramp:
+Wedge (4, 0, -4)(width: 2, height: 1.5, length: 4)
+diamond: (3.8, 2, 0 )(width: 0.2, height: 1.5)
+diamond: (6.2, 2, 0) (width: 0.2, height: 1.5)
+	*/
 #define ADDRITEM mAllRitems.emplace_back(std::make_unique<RenderItem>
+	ADDRITEM("grid", oI++, geo,					XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, -5.0f, 0.0f)));
+	// Body:
+	ADDRITEM("cylinder", oI++, geo,             XMMatrixScaling(10.0f, 4.0f, 10.0f) * XMMatrixTranslation(0.0f, -3.0f, 0.0f)));
+	ADDRITEM("nCyl10_9", oI++, geo,             XMMatrixScaling(10.0f, 2.0f, 10.0f) * XMMatrixTranslation(0.0f, 0.0f, 0.0f)));
+	ADDRITEM("cylinder", oI++, geo,             XMMatrixScaling(9.0f, 3.0f, 9.0f) * XMMatrixTranslation(0.0f, 2.5f, 0.0f)));
+	ADDRITEM("nCyl9_5", oI++, geo,              XMMatrixScaling(10.0f, 4.0f, 10.0f) * XMMatrixTranslation(0.0f, 6.0f, 0.0f)));
+	// Peak:
+	ADDRITEM("cone", oI++, geo,					XMMatrixScaling(5.0f, 10.0f, 5.0f) * XMMatrixTranslation(0.0f, 13.0f, 0.0f)));
+	ADDRITEM("torus", oI++, geo,				XMMatrixScaling(5.0f, 5.0f, 5.0f) * XMMatrixTranslation(0.0f, 12.0f, 0.0f)));
+	ADDRITEM("torus", oI++, geo,				XMMatrixScaling(4.0f, 4.0f, 4.0f) * XMMatrixTranslation(0.0f, 14.0f, 0.0f)));
+	// Spires:
+	UINT numSpires = 8;
+	float thetaStep = 2.0 * XM_PI / numSpires;
+	for (UINT i = 0; i < numSpires; i++)
+	{
+		float zOffset = cosf(thetaStep * i) * 10.0f;
+		float xOffset = sinf(thetaStep * i) * 10.0f;
+		ADDRITEM("triangularPrism", oI++, geo,      XMMatrixRotationY(-thetaStep * i) * XMMatrixScaling(0.5f, 10.5f, 0.5f) * XMMatrixTranslation(xOffset, 0.25f, zOffset)));
+		ADDRITEM("pyramid", oI++, geo,              XMMatrixRotationY(thetaStep * i) * XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(xOffset, 6.0f, zOffset)));
+	}
+	// Ramp:
+	ADDRITEM("wedge", oI++, geo,				 XMMatrixScaling(4.0f, 1.5f, 4.0f) * XMMatrixRotationY(thetaStep * 0.5f) * XMMatrixTranslation(-sinf(thetaStep * 0.5f) * 11.25f, -4.35f, -cosf(thetaStep * 0.5f) * 11.25f)));
+
+
+
 	//ADDRITEM("grid", oI++, geo));
 	//ADDRITEM("cone", oI++, geo,             XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, 0.5f, 6.0f)));
 	//ADDRITEM("wedge", oI++, geo,            XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(3.0f, 0.5f, 0.0f)));
-	ADDRITEM("torus", oI++, geo,            XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, 0.0f, 0.0f)));
 	//ADDRITEM("truncatedPyramid", oI++, geo,	XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(-3.0f, 0.5f, 0.0f)));
 	//ADDRITEM("triangularPrism", oI++, geo,  XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, 1.0f, 9.0f)));
 	//ADDRITEM("pyramid", oI++, geo,          XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, 0.5f, 3.0f)));
 	//ADDRITEM("box", oI++, geo,              XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 0.5f, 0.0f)));
 #undef ADDRITEM
-
-	//UINT objCBIndex = oI;
-	//for(int i = 0; i < 5; ++i)
-	//{
-	//	auto leftCylRitem = std::make_unique<RenderItem>();
-	//	auto rightCylRitem = std::make_unique<RenderItem>();
-	//	auto leftSphereRitem = std::make_unique<RenderItem>();
-	//	auto rightSphereRitem = std::make_unique<RenderItem>();
-
-	//	XMMATRIX leftCylWorld = XMMatrixTranslation(-5.0f, 1.5f, -10.0f + i*5.0f);
-	//	XMMATRIX rightCylWorld = XMMatrixTranslation(+5.0f, 1.5f, -10.0f + i*5.0f);
-
-	//	XMMATRIX leftSphereWorld = XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i*5.0f);
-	//	XMMATRIX rightSphereWorld = XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i*5.0f);
-
-	//	XMStoreFloat4x4(&leftCylRitem->World, rightCylWorld);
-	//	leftCylRitem->ObjCBIndex = objCBIndex++;
-	//	leftCylRitem->Geo = mGeometries["shapeGeo"].get();
-	//	leftCylRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	//	leftCylRitem->IndexCount = leftCylRitem->Geo->DrawArgs["cylinder"].IndexCount;
-	//	leftCylRitem->StartIndexLocation = leftCylRitem->Geo->DrawArgs["cylinder"].StartIndexLocation;
-	//	leftCylRitem->BaseVertexLocation = leftCylRitem->Geo->DrawArgs["cylinder"].BaseVertexLocation;
-
-	//	XMStoreFloat4x4(&rightCylRitem->World, leftCylWorld);
-	//	rightCylRitem->ObjCBIndex = objCBIndex++;
-	//	rightCylRitem->Geo = mGeometries["shapeGeo"].get();
-	//	rightCylRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	//	rightCylRitem->IndexCount = rightCylRitem->Geo->DrawArgs["cylinder"].IndexCount;
-	//	rightCylRitem->StartIndexLocation = rightCylRitem->Geo->DrawArgs["cylinder"].StartIndexLocation;
-	//	rightCylRitem->BaseVertexLocation = rightCylRitem->Geo->DrawArgs["cylinder"].BaseVertexLocation;
-
-	//	XMStoreFloat4x4(&leftSphereRitem->World, leftSphereWorld);
-	//	leftSphereRitem->ObjCBIndex = objCBIndex++;
-	//	leftSphereRitem->Geo = mGeometries["shapeGeo"].get();
-	//	leftSphereRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	//	leftSphereRitem->IndexCount = leftSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
-	//	leftSphereRitem->StartIndexLocation = leftSphereRitem->Geo->DrawArgs["sphere"].StartIndexLocation;
-	//	leftSphereRitem->BaseVertexLocation = leftSphereRitem->Geo->DrawArgs["sphere"].BaseVertexLocation;
-
-	//	XMStoreFloat4x4(&rightSphereRitem->World, rightSphereWorld);
-	//	rightSphereRitem->ObjCBIndex = objCBIndex++;
-	//	rightSphereRitem->Geo = mGeometries["shapeGeo"].get();
-	//	rightSphereRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	//	rightSphereRitem->IndexCount = rightSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
-	//	rightSphereRitem->StartIndexLocation = rightSphereRitem->Geo->DrawArgs["sphere"].StartIndexLocation;
-	//	rightSphereRitem->BaseVertexLocation = rightSphereRitem->Geo->DrawArgs["sphere"].BaseVertexLocation;
-
-	//	mAllRitems.push_back(std::move(leftCylRitem));
-	//	mAllRitems.push_back(std::move(rightCylRitem));
-	//	mAllRitems.push_back(std::move(leftSphereRitem));
-	//	mAllRitems.push_back(std::move(rightSphereRitem));
-	//}
 
 	// All the render items are opaque.
 	for(auto& e : mAllRitems)
