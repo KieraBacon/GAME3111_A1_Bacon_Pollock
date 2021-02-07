@@ -767,7 +767,7 @@ diamond: (3.8, 2, 0 )(width: 0.2, height: 1.5)
 diamond: (6.2, 2, 0) (width: 0.2, height: 1.5)
 	*/
 #define ADDRITEM mAllRitems.emplace_back(std::make_unique<RenderItem>
-	ADDRITEM("grid", oI++, geo,					XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, -5.0f, 0.0f)));
+	ADDRITEM("grid", oI++, geo, XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, -5.0f, 0.0f)));
 	// Body:
 	ADDRITEM("cylinder", oI++, geo,             XMMatrixScaling(10.0f, 4.0f, 10.0f) * XMMatrixTranslation(0.0f, -3.0f, 0.0f)));
 	ADDRITEM("nCyl10_9", oI++, geo,             XMMatrixScaling(10.0f, 2.0f, 10.0f) * XMMatrixTranslation(0.0f, 0.0f, 0.0f)));
@@ -789,16 +789,6 @@ diamond: (6.2, 2, 0) (width: 0.2, height: 1.5)
 	}
 	// Ramp:
 	ADDRITEM("wedge", oI++, geo,				 XMMatrixScaling(4.0f, 1.5f, 4.0f) * XMMatrixRotationY(thetaStep * 0.5f) * XMMatrixTranslation(-sinf(thetaStep * 0.5f) * 11.25f, -4.35f, -cosf(thetaStep * 0.5f) * 11.25f)));
-
-
-
-	//ADDRITEM("grid", oI++, geo));
-	//ADDRITEM("cone", oI++, geo,             XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, 0.5f, 6.0f)));
-	//ADDRITEM("wedge", oI++, geo,            XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(3.0f, 0.5f, 0.0f)));
-	//ADDRITEM("truncatedPyramid", oI++, geo,	XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(-3.0f, 0.5f, 0.0f)));
-	//ADDRITEM("triangularPrism", oI++, geo,  XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, 1.0f, 9.0f)));
-	//ADDRITEM("pyramid", oI++, geo,          XMMatrixScaling(1.0f, 1.0f, 1.0f) * XMMatrixTranslation(0.0f, 0.5f, 3.0f)));
-	//ADDRITEM("box", oI++, geo,              XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 0.5f, 0.0f)));
 #undef ADDRITEM
 
 	// All the render items are opaque.

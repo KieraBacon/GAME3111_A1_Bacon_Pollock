@@ -1138,28 +1138,25 @@ GeometryGenerator::MeshData GeometryGenerator::CreateTorus(float radius, float c
 {
 	MeshData meshData;
 
-	float thetaStep = 2.0f * XM_PI / sliceCount;
-	float phiStep = 2.0f * XM_PI / crossCount;
+	// The steps for each of the separate rotations
+	float thetaStep = 2.0f * XM_PI / sliceCount; // the steps around the ring
+	float phiStep = 2.0f * XM_PI / crossCount; // the steps around the cross section
 
 	// For each slice around the circumference of the torus
-	for (uint32 i = 0; i <= crossCount - 1; ++i)
+	for (uint32 i = 0; i <= sliceCount; ++i)
 	{
-		float phi = i * phiStep;
+		float theta = i * thetaStep;
 
-		// Vertices of ring.
-		for (uint32 j = 0; j <= sliceCount; ++j)
+		// for each vertex around the cross section
+		for (uint32 j = 0; j <= crossCount; ++j)
 		{
-			float theta = j * thetaStep;
+			float phi = j * phiStep;
 
 			Vertex v;
 
-			float c = cosf(theta);
-			float s = sinf(theta);
-
-			// spherical to cartesian
-			v.Position.x = radius * c + crossRadius * sinf(phi) * c;
+			v.Position.x = radius * cosf(theta) + crossRadius * sinf(phi) * cosf(theta);
 			v.Position.y = crossRadius * cosf(phi);
-			v.Position.z = radius * s + crossRadius * sinf(phi) * s;
+			v.Position.z = radius * sinf(theta) + crossRadius * sinf(phi) * sinf(theta);
 
 			// Partial derivative of P with respect to theta
 			v.TangentU.x = -crossRadius * sinf(phi) * sinf(theta);
@@ -1179,23 +1176,19 @@ GeometryGenerator::MeshData GeometryGenerator::CreateTorus(float radius, float c
 		}
 	}
 
-	//
-	// Compute indices
-	//
-
 	uint32 baseIndex = 0;
 	uint32 ringVertexCount = sliceCount + 1;
-	for (uint32 i = 0; i < crossCount - 2; ++i)
+	for (uint32 i = 0; i < sliceCount; ++i)
 	{
-		for (uint32 j = 0; j < sliceCount; ++j)
+		for (uint32 j = 0; j < crossCount; ++j)
 		{
-			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j);
-			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j + 1);
-			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			meshData.Indices32.push_back(i * (sliceCount + 1) + (j + 1));
+			meshData.Indices32.push_back(i * (sliceCount + 1) + j);
+			meshData.Indices32.push_back((i + 1) * (sliceCount + 1) + j);
 
-			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j + 1);
-			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			meshData.Indices32.push_back(i * (sliceCount + 1) + (j + 1));
+			meshData.Indices32.push_back((i + 1) * (sliceCount + 1) + j);
+			meshData.Indices32.push_back((i + 1) * (sliceCount + 1) + (j + 1));
 		}
 	}
 
